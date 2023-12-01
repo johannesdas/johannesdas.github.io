@@ -15,6 +15,18 @@
 			width: 750px;
 			height: 160px;
 		}
+		.mediumVolumeGraphs {
+			width: 350px;
+			height: 210px;
+		}
+		.smallVolumeGraphs {
+			width: 360px;
+			height: 120px;
+		}
+		.smallPerGraphs {
+			width: 550px;
+			height: 120px;
+		}
 	</style>
 
 	<head>
@@ -58,10 +70,24 @@
 								</header>
 									<center><h2>Purpose</h2></center>
 									<p> The intent and purpose of this project is to visualize and analyze the goalscoring ability of major football players. The data has been collected for domestic league goals scored by 55 major players. Most of these players are extremely well-known and widely considered to be successful. The project strives to analyze the importance of each league goal by the difficulty of the opponent.</p>
-									<p> The source for all the information was Transfermarkt.com. Data was collected by myself. The time span is the 2006-07 season (henceforth as the "2007 season") to the 2021-22 season (henceforth as the "2022 season"). </p>
+									<p> The source for all the information was Transfermarkt.com. Data was collected by the author through web scraping. The time span is the 2006-07 season (henceforth as the "2007 season") to the 2021-22 season (henceforth as the "2022 season"). The data was loaded on to Excel, explored through Python and transformed into visuals through Python and Tableau. </p>
 								<div class="image main"><img src="images/Lewandowski.jpg"/></div>
 								<h2><b><center>Summary of Findings</center></b></h2>
-								<p>(in progress)</p>
+								<body>
+									<ul>
+										<li>72.5% of goals are scored between the ages of 24-32; the highest-scoring age is 29</li>
+										<li>Age and Goals have a Normal distribution; Age and PPG (Efficiency) do not have a relationship</li>
+										<li>There is no relationship between Goals and Year for each Age group (i.e. 27-year-olds do not score more goals as the years go by) </li>
+										<li>Ronaldo and Messi dominate by volume; Icardi is the most efficient</li>
+										<li>Aguero scores the highest proportion of his goals against Contending teams, Neymar the highest against Relegation teams</li>
+										<li>Of high-volume seasons, the best are Messi 2012 and Ronaldo 2011</li>
+										<li>Of low-volume seasons, the best are Forlan 2010 and Vardy 2018</li>
+										<li>Of seasons which maintain high efficiencies, the standouts for volume are Di Natale 2010, Di Natale 2011 and Dzeko 2009</li>
+										<li>Of seasons which maintain low efficiencies, the standouts for volume are Huntelaar 2012, Suarez 2014 and Messi 2015</li>
+										<li>Rooney 2011 might be the worst 25+ goal season of them all; Messi 2015 the worst 40+ goal season (he scored 51% of his goals against Relegation teams)</li>
+										<li>In general, each player has a distinct profile and skillset. Predicting how well a player plays against high-quality opposition in a particular season is practically impossible. It is possible, however, to predict when a player's peak will occur by Age: it is almost certainly in the age bracket of 24-32 with the most likely peak age being 29</li>
+									</ul>
+								</body>
 								<h2><b><center>Introduction</center></b></h2>
 								<p> There are long-standing debates in the footballing world. Who is better - Ronaldo or Messi? Is Haaland likely to be the next Lewandowski? Was Benzema a better big-game player than Suarez? Is Lukaku a mid-table menace rather than a big-game player? The answers to some of these questions may be elucidated a bit further here. </p>
 								<p> Most talented players aim to play in one of the main four leagues: La Liga (Spain), Serie A (Italy), Bundesliga (Germany) or the EPL (England). Each of these leagues follow a nearly identical structure and format: There are 20 teams per season for Italy, Spain and England; 18 for the Bundesliga. Each team plays the other teams once at home and once away, for a total of 38 games (34 for the Bundesliga). 3 points for a win, 1 for a draw, 0 for a loss. The team with the most points at the end of the season wins the league. </p>
@@ -76,8 +102,8 @@
 										<tr>
 										<th id="Categories"> Tier or Difficulty
 										<th> Name
-										<th> Points Ratio
-										<th> Points Total (Rounded)
+										<th> Team Points Ratio
+										<th> Total Team Points (Rounded)
 										<th> Total % of Teams
 									</thead>
 									<tbody>
@@ -108,9 +134,57 @@
 									</tbody>
 								</table></center>
 								<p> As one can see, the categorization is quite simple and straightforward. It is purely mathematical and does not conflate highly variable factors. Ultimately, at the end of the season, no one asks about injuries or poor form or bad refereeing decisions - one simply looks at the final league position of a team to judge whether the season was satisfactory or not. This is the basis for the following analysis. </p>
+								<center><h2>Calculation of Player Points</h2></center>
+								<p> Players will be awarded <b>Points</b> for each goal they score. The points will be then aggregated by Player, Year, Tier, Age and any other variable that may give an insight into the data.</p>
+								<p> The calculation of points is intended to be straightforward. There will exist a <b>Multiplier</b> for each goal scored. This Multiplier will depend solely on the Tier of the opponent. The purpose of this Multiplier is to highlight the differences between the difficulty of the opponents. If no Multiplier is added, then the difference between good and bad seasons become difficult to detect. Thus, the formula of <b><i>Team Ratio * Multiplier</i></b> will ultimately yield the final Points value awarded to a player for each goal.</p>
+								<p> Mid-Table teams are taken as the average of the dataset - hence the Multiplier for them shall be 1. The other three Tiers shall be thinly balanced out such that there is a certain level of equity in the distribution of Multipliers.</p>
+								<center><table>
+									<thead>
+										<tr>
+										<th id="Categories"> Tier or Difficulty
+										<th> Name
+										<th> Team Points Ratio
+										<th> Multiplier
+									</thead>
+									<tbody>
+										<tr>
+											<td> Tier I
+											<td> Contending Teams
+											<td> >70%
+											<td> 1.5
+										<tr>
+											<td> Tier II
+											<td> Good Teams
+											<td> 50%-70%
+											<td> 1.25
+										<tr>
+											<td> Tier III
+											<td> Mid-Table Teams
+											<td> 35%-50%
+											<td> 1
+										<tr>
+											<td> Tier IV
+											<td> Relegation Teams
+											<td> <35%
+											<td> 0.75
+									</tbody>
+								</table></center>
+								<p><b>Example:</b> Messi has scored 8 goals this season: 1 against Madrid, 2 against Valencia, 2 against Osasuna and 3 against Mallorca. Madrid finished the season with 85 points, Valencia with 76, Osasuna with 45 and Mallorca with 27. How many points did Messi acquire this season?</p>
+								<body>
+									<ul>
+										<li><b>Formula: Team Points/Total Possible Points * Multiplier * Number of Goals</b></li>
+										<li>Madrid: 85/114 * 1.5 * 1 = 1.12</li>
+										<li>Valencia: 76/114 * 1.25 * 2 = 1.67</li>
+										<li>Osasuna: 45/114 * 1 * 2 = 0.79</li>
+										<li>Mallorca: 27/114 * 0.75 * 3 = 0.53</li>
+									</ul>
+								</body>
+								<p> Messi has acquired 4.11 points from 8 goals, giving him 0.51 Points-Per-Goal.</p>
 								<p> <b>Choice of Players: </b>As mentioned earlier, the information was collected for the Top Four Leagues for the 16 seasons between 2007 and 2022. Players who have been included in the project have played at least 3 seasons in at least one of these leagues. Furthermore, they have tallied a minimum of 50 goals across that time period. Of course, players play for different teams and move between the leagues as well. This was not considered an evaluable factor as team changes are highly volatile from year to year and depend on a multitude of factors. Oftentimes, the same team can be drastically different in adjacent seasons. The changing of leagues, however, will hopefully be visible as an important factor in narrating the story of a player's career.</p>
 								<p> 55 players were thus included in the project. Notable names are Cristiano Ronaldo, Lionel Messi, Robert Lewandowski, Karim Benzema, Luis Suarez and Sergio Aguero. Players who have had spontaneously proficient seasons, such as Radamel Falcao or Diego Forlan, have also been included. Players who have played for a long duration but haven't scored in high densities, such as Aritz Aduriz, have also been included. Almost all players played as forwards or wingers; Frank Lampard is the only midfielder on the list.</p>
-								<p> <b>Preliminary Analysis: </b>Of the 55 players included, there are a total of 563 seasons played and 8176 league goals scored. Each season is marked by the <b>Total Points</b> and a measure of <b>Points Per Goal (henceforth "PPG")</b>.</p>
+								<center><h2>Establishment of Categories</h2></center>
+								<p> Of the 55 players included, there are a total of 563 seasons played and 8176 league goals scored. Each season is marked by the total <b> Goals, </b>total <b>Points</b> and the <b>Points-Per-Goal (henceforth "PPG")</b>.</p>
+								<p> The relationship between Points and Goals is a direct one. As mentioned earlier, points are awarded for goals by the formula <b><i>Team Ratio * Multiplier = Points</i></b>. As one might expect, a player who scores more goals is going to accumulate more points. The ratio isn't absolutely direct, however, as players can accumulate points at different rates. Those who score more often against high-quality opposition will accumulate points faster than those who score mostly against low-quality opposition.</p>
 								<p> The Total Points can be used as a good measure of a season's success: 106 of the 563 seasons have accumulated in excess of 10 points. This accounts for roughly one-fifth (18.8%) of the collected seasons, thereby making it a healthy standard for <b>Effective Seasons</b>. Throughout an Effective Season, a player accumulates at least 10 points. This cutoff allows us to filter out the seasons where a player might have been too young, too old, prone to injuries or simply below-standard.</p>
 								<p> Of these 106 Effective Seasons, nearly one-third of them (29%) are from just three players: 12 seasons by Messi, 12 by Ronaldo and 7 by Lewandowski. The lowest goal total is Diego Forlan's 2010 season with 18 goals and the highest is Lionel Messi's 2012 season with 50 goals. The highest scoring season to fall <i>outside</i> this range is Wayne Rooney's 2010 season with 26 goals (i.e. 26 goals but still less than 10 points).</p>
 								<p> One would also be wise to look at the PPG ratio: it is a simple ratio of points collected per goal scored. This ratio ought to give a better insight into the particularities of each seasons. Did the player score a high volume of goals against Relegation teams and Mid-Table teams? Or did they score a low volume of goals against Contending and Good teams? This measure is likely to function better as a secondary-view of <b>Efficient Seasons</b> rather than a primary filter. Throughout an Efficient Season, a player accumulates at least 0.45 Points Per Goal (the median).</p>
@@ -150,7 +224,41 @@
 								<center><div class="image"><img src="images/Block28.png" class="blockGraphs"/></div></center>
 								<p>As one can see, there are no definite patterns here. It appears that, despite blocking for Age, Year and Goals still do not show any discernable relationship. Although not shown, Year and PPG also failed to show any relationship. The PPG-Year graphs (with blocking for Age) can be found on my GitHub.</p>
 								<p><b>Conclusion:</b> There is no discernable relationship between either Year and Goals or Year and PPG.</p>
-								<center><h2> Part III: Analysis By Season</h2></center>
+								<center><h2> Part III: Analysis by Volume and Difficulty</h2></center>
+								<p> Here we shall look at the spread throughout the four Tiers of difficulty by volume and by proportion.</p>
+								<center><h3>Volume</h3></center>
+								<center><div class="image"><img src="images/MostGoals.png" class="mediumVolumeGraphs"/></div></center>
+								<p> Of the 55 players included, here are the ten with the highest volume of goals. The majority of them will have their individual seasons analyzed in the following section.</p>
+								<p> For those who follow soccer closely, it should not be a surprise to see Ronaldo and Messi at the very top. The voluminal difference between Messi-Lewandowski (2nd-3rd) is more than the difference between Lewandowski-Kane (3rd-10th). It must also be noted that most players are within 2 percentage points of the median PPG of 0.45. The two exceptions are Immobile (-3%) and Dzeko (+3%). This likely suggests that 0.43-0.47 is the expected range of efficiency sustainable at high volumes. Discrepancies may occur in individual seasons but are unlikely across entire careers.</p>
+								<center><div class="image"><img src="images/MostPoints.png" class="mediumVolumeGraphs"/></div></center>
+								<p> When ordered by total points, the list has only one major player change: Immobile is replaced by Di Natale. Otherwise, Higuain-Suarez and Benzema-Dzeko swap places.</p>
+								<center><div class="image"><img src="images/HighestPPG.png" class="mediumVolumeGraphs"/></div></center>
+								<p> As mentioned earlier, it appears that the ideal range of efficiency for high volume is 0.43-0.47. Most of the players with high efficiencies also have lower volumes. This likely suggests that it is difficult to maintain a high efficiency across high-volume seasons. One must necessarily acquire a high-volume by scoring a lot against Mid-Table and Relegation teams in the first place (who jointly represent 68% of an average league). This will naturally bring the efficiency down. In this context, Dzeko appears to be the only outlier who has succeeded in maintaining a high-volume and high-efficiency.</p>
+								<center><div class="image"><img src="images/LowestPPG.png" class="mediumVolumeGraphs"/></div></center>
+								<p> Here we find the players who are the least efficient. Lampard, our sole midfielder and chief penalty taker, is present here. Immobile and Bale both have the stereotype of being "mid-table menaces" - implying that they both score largely against mediocre, Mid-Table teams. It would seem that the stereotype is largely correct. In the case of Bale, however, the point must be made that he played a large part of his career (2014-2018) with Ronaldo. During those seasons, Ronaldo was the primary goalscorer and most likely to score in big-games. Hence it may be argued that Bale's role in big-games was different: he had to support Ronaldo and couldn't afford to take selfish shots at goal.</p>
+								<p> The presence of Rooney as Manchested United's highest goalscorer appears odd but can be justified in a similar line of reasoning as Bale: Rooney often had to play second-fiddle to better goalscorers in big-games (Ronaldo & Van Persie) and couldn't afford to be as selfish.</p>
+								<center><h3>Difficulty</h3></center>
+								<center><h3>Contending & Good Teams</h3></center>
+								<center><div class="image"><img src="images/Tier1ByTotal.png" class="smallVolumeGraphs"/></div></center>
+								<center><div class="image"><img src="images/Tier2ByTotal.png" class="smallVolumeGraphs"/></div></center>
+								<p> Against Contending teams, we expected to find both Ronaldo and Messi due to their massive volume of goals. Aguero also shows up with his penchant for performance. Against Good teams, the dominance of Ronaldo and Messi becomes more visible. Other players may match the pair with goals against Contending teams, but to sustain that level of motivation and performance against Good teams seems to be more difficult. It is possible that this is a psychological phenomenon: perhaps Icardi can motivate himself to play very well against Contending teams, but that same motivation doesn't arrive for Good teams. The touch can be sloppy, the positioning can be lazy, the passes can be haphazard - none of these would likely occur as frequently if the mental acuity was turned up. Perhaps the dominance of Ronaldo and Messi is not merely one of talent and longevity - it is about the mental drive for performance as well.</p>
+								<center><div class="image"><img src="images/Tier1ByPer.png" class="smallPerGraphs"/></div></center>
+								<center><div class="image"><img src="images/Tier2ByPer.png" class="smallPerGraphs"/></div></center>
+								<p> We see once again that Aguero dominates the proportions against Contending teams. Ribery and Vardy both obtain their high efficiencies by goals against Good teams. Ribery actually scores more often against Good teams than he does against Mid-Table teams (remember that Mid-Table teams are 43% of the league on average, whereas Good teams are only 24%).</p>
+								<center><h3>Mid-Table & Relegation Teams</h3></center>
+								<center><div class="image"><img src="images/Tier3ByTotal.png" class="smallVolumeGraphs"/></div></center>
+								<center><div class="image"><img src="images/Tier4ByTotal.png" class="smallVolumeGraphs"/></div></center>
+								<p> Once again, there is nothing surprising here: high-volume scorers tend to beat down on mediocre and poorer teams the most.</p>
+								<center><div class="image"><img src="images/Tier3ByPer.png" class="smallPerGraphs"/></div></center>
+								<center><div class="image"><img src="images/Tier4ByPer.png" class="smallPerGraphs"/></div></center>
+								<p> Here we see that Huntelaar scores a whopping 69% of his goals against Mid-Table opponents whereas Neymar tops the list for highest proportion against Relegation teams.</p>
+								<p><b> Conclusion:</b> Ronaldo and Messi dominate the volume charts by Tier. Aguero scores the highest proportion of his total goals against Contending teams, Ribery against Good teams, Huntelaar against Mid-Table teams and Neymar against Relegation teams.</p>
+								<center><h2> Part IV: Analysis of Efficiency By Volume</h2></center>
+								<p> The relationship between PPG and Goals by Season can be seen below:</p>
+								<center><div class="image"><img src="images/PPGByGoals.png" class="largeGraphs"/></div></center>
+								<p> The erratic behavior at the lower and higher ends can be explained by a small sample size at the higher and lower aggregates. Barring these discrepancies at the extremes, the efficiency of a season cannot be deduced by the volume of goals. At the higher end, it is evident that some players can score 40+ goals with high efficiency while others score the same amount with low efficiency.</p>
+								<p><b> Conclusion: </b>There is no direct correlation between PPG and Goals in a Season, although exceptions can certainly occur.</p>
+								<center><h2> Part V: Analysis of Efficiency & Effectiveness By Season</h2></center>
 								<p>Here, we shall take a deeper look at the particular natures of the seasons involved. The seasons of the players will be grouped off into five categories:</p>
 								<body>
 									<ul>
